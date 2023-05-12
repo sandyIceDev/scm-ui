@@ -1,40 +1,45 @@
 <script>
     //https://www.npmjs.com/package/elliptic
-  
-    let email = "";
+    import { toast } from '@zerodevx/svelte-toast'
+    import { user } from "../store/user"; 
+    import Button, {Label} from "@smui/button";
+    import { onMount,onDestroy } from "svelte";
+    let username = "";
     let password = "";
-    import { aesDecrypt, aesEncrypt, generateEllipticParikey , generateEllipticShareKey} from '../lib/cr'
-    import '../assets/css/login.css'
     function handleSubmit() {
-      let x= generateEllipticParikey();
-      let y= generateEllipticParikey();
-      let shared1 = generateEllipticShareKey(x.private,y.public);
-      let shared2 = generateEllipticShareKey(y.private,x.public);
-      console.log(shared1);
-      console.log(shared2 === shared1);
-      let e = aesEncrypt(shared1,"this is message");
-      console.log(e);
-      let d = aesDecrypt(shared2,e);
-      console.log(d);
+        user.login(password,username).then(res=>{
+          toast.push("login successfull",{theme:{
+            '--toastBackground': '#4bb543',
+            '--toastColor': 'black',
+          }});
+        }).catch(e=>{
+          toast.push(e.message,{theme:{
+            '--toastBackground': '#ff1010',
+            '--toastColor': 'white',
+          }});
+        });
     }
-  </script>
-  
-  <svelte:head>
-    <link href="/css/login.css" rel="stylesheet" type="text/css">
-  </svelte:head>
+</script>
+
+<svelte:head>
+  <link href="/css/login.css" type="text/css" rel="stylesheet" />
+</svelte:head>
+
 
   <div class="container">
     <div class="card">
       <div class="card-header">Login</div>
       <div class="card-body">
         <form on:submit|preventDefault={handleSubmit}>
-          <label for="email">Email:</label>
-          <input type="email" id="email" bind:value={email} placeholder="Enter your email address">
+          {#if $user === null}            
+          <label for="username">Username:</label>
+          <input type="text" id="username" bind:value={username} placeholder="Enter your username">
+          {/if}
   
           <label for="password">Password:</label>
           <input type="password" id="password" bind:value={password} placeholder="Enter your password">
   
-          <button type="submit">Login</button>
+          <Button type="submit"><Label>Login</Label></Button>
         </form>
       </div>
     </div>

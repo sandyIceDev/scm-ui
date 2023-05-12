@@ -26,7 +26,7 @@ function generateEllipticParikey(){
 
   var key = ec.genKeyPair();
   return {
-    public:key.getPublic().encode("hex"),
+    public:key.getPublic().encode("hex",true),
     private:key.getPrivate().toJSON(),
   }
 }
@@ -37,8 +37,9 @@ function generateEllipticShareKey(prvKey,pubKey){
     var key = ec.keyFromPrivate(prvKey)
     var pub = ec.keyFromPublic(pubKey,"hex")
     var shared = key.derive(pub.getPublic());
-    return shared.toString(16);
+    return shared.toString("hex");
 }
+
 function aesEncrypt(sharedKey,msg){
     var key = CryptoJS.enc.Hex.parse(sharedKey); // 256-bit key
     var iv = CryptoJS.enc.Hex.parse(CryptoJS.SHA256(sharedKey).toString().substring(0,32));
@@ -48,6 +49,10 @@ function aesEncrypt(sharedKey,msg){
         padding: CryptoJS.pad.Pkcs7
     });
     return encrypted.toString();
+}
+function sha256(data){
+    let hash = CryptoJS.SHA256(data);
+    return hash.toString(CryptoJS.enc.Hex);
 }
 
 function aesDecrypt(sharedKey,msg){
@@ -67,5 +72,6 @@ export {
     generateEllipticParikey,
     generateEllipticShareKey,
     aesEncrypt,
-    aesDecrypt
+    aesDecrypt,
+    sha256
 };

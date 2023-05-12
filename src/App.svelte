@@ -1,14 +1,15 @@
 <script>
-  import svelteLogo from './assets/svelte.svg'
-  import viteLogo from '/vite.svg'
-  import Router from "svelte-spa-router"
+  import Router  from "svelte-spa-router"
   import Login from './Routes/Login.svelte';
   import Home from './Routes/Home.svelte';
-
+	import Register from './Routes/Register.svelte';
+  import { SvelteToast } from '@zerodevx/svelte-toast'
   const routes = {
     '/':Home,
-    '/Login':Login,
+    '/login':Login,
+    '/register':Register,
   }
 </script>
 
+<SvelteToast />
 <Router {routes}/>

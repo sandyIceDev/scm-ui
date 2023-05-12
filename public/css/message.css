@@ -1,0 +1,39 @@
+.message{
+    display: flex;
+    max-width: 30vw;
+    width: fit-content;
+    background-color:rgb(26, 101, 104);
+    flex-direction: column;
+    margin:10px;
+    padding:10px;
+    border-radius:10px;
+}
+
+.message-right .message-left{
+    width: 100%;   
+}
+.message-right .message{
+    border-bottom-right-radius: 0px;
+    float:right;
+    clear:both;
+}
+.message-left .message{
+    border-bottom-left-radius: 0px;
+    float:left;
+    clear:both;
+}
+.message-body , .message-footer{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.seen{
+    margin:0px 10px;
+    color:rgb(18, 243, 18);
+}
+.time{
+    margin: 3px 10px;
+}
+.content{
+    line-break: anywhere;
+}
