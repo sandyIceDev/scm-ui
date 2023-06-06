@@ -50,6 +50,7 @@ function aesEncrypt(sharedKey,msg){
     });
     return encrypted.toString();
 }
+
 function sha256(data){
     let hash = CryptoJS.SHA256(data);
     return hash.toString(CryptoJS.enc.Hex);

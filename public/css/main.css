@@ -16,6 +16,29 @@
     height: 120px;
     padding: 0 20px;
 }
+.app-inbar{
+    width: 100%;
+    min-height: 60px;
+    max-height: 15vh;
+    height: auto;
+    /* background: #7f7f7ff0; */
+    border:none;
+    border-top:1px solid red;
+    word-wrap: break-word;
+    overflow-y: scroll;
+    font-size: x-large;
+}
+.app-inbar:focus{
+    outline: none;
+    border-top:1px solid green;
+}
+.send-btn{
+    background-color:rgb(0, 255, 115);
+    display: block;
+    position: absolute;
+    bottom:10px;
+    right:10px;
+}
 .side{
     background:rgb(21, 60, 85);
     width: 30%;

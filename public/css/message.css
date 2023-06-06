@@ -5,10 +5,16 @@
     background-color:rgb(26, 101, 104);
     flex-direction: column;
     margin:10px;
-    padding:10px;
     border-radius:10px;
 }
 
+.welcom{
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
 .message-right .message-left{
     width: 100%;   
 }
@@ -27,13 +33,22 @@
     flex-direction: row;
     justify-content: space-between;
 }
+.message-footer {
+    bottom:0;
+}
+
+.message-body {
+    top:0;
+}
+
 .seen{
-    margin:0px 10px;
+    margin:3px 10px;
     color:rgb(18, 243, 18);
 }
 .time{
     margin: 3px 10px;
 }
 .content{
+    margin: 3px 10px 5px 10px;
     line-break: anywhere;
 }

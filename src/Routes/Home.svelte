@@ -3,7 +3,27 @@
     import { user } from "../store/user";
     import { push } from "svelte-spa-router";
 	import Chat from "./Chat.svelte";
-	import Contacts from "./Contacts.svelte";
+	import { toast } from "@zerodevx/svelte-toast";
+	import ChatsList from "./ChatsList.svelte";
+	import { chats } from "../store/chat";
+	import { chatId } from "../store/peer";
+
+    let peer = null;
+    let websocket = null;
+    let connection_state = "pending";
+    
+    
+    function handleConnect(){
+        websocket = new WebSocket(`ws://127.0.0.1:5000/api/ws/${$user.uuid}`);
+        connection_state = "pending"
+        websocket.onopen = (e)=>{
+            console.log("connected to server!");
+            connection_state = "connected";
+        };
+        websocket.onclose = (e)=>{
+            connection_state = "disconnected";
+        };
+    }
     
     onMount(()=>{
         user.check().then(checkd=>{
@@ -11,13 +31,28 @@
                 push("#/login");
             else if(checkd === "register")
                 push("#/register");
+            else if(checkd === false){
+                user.logout();
+                toast.push("some thing went wrong",{theme:{
+                    '--toastBackground': '#ff1010',
+                    '--toastColor': 'black',
+                }});
+                push("#/login");
+            }
+            else{
+                handleConnect();
+                let intervalId = setInterval(()=>{
+                    if(connection_state === "disconnected")
+                        handleConnect();
+                },5000);
+            }
         }).catch(err=>{
             console.log("fail to check router");
         })
     });
     function HandleChat(e){
-        let uuid = e.detail.uuid;
-        console.log("change route to "+uuid);
+        let selectedChatId = e.detail.chatId;
+        chatId.set(selectedChatId);
     }
 </script>
 
@@ -26,6 +61,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </svelte:head>
 <div class="container">
-    <Contacts on:ChatContact={HandleChat} />
-    <Chat />
+    <ChatsList on:selctChat={HandleChat} connection_state={connection_state}/>
+    <Chat/>
 </div>

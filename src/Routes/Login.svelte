@@ -4,20 +4,24 @@
     import { user } from "../store/user"; 
     import Button, {Label} from "@smui/button";
     import { onMount,onDestroy } from "svelte";
+	import { aesEncrypt, generateEllipticParikey } from '../lib/cr';
+	import sha256 from 'crypto-js/sha256';
+	import { push } from 'svelte-spa-router';
     let username = "";
     let password = "";
     function handleSubmit() {
-        user.login(password,username).then(res=>{
-          toast.push("login successfull",{theme:{
-            '--toastBackground': '#4bb543',
-            '--toastColor': 'black',
-          }});
-        }).catch(e=>{
-          toast.push(e.message,{theme:{
-            '--toastBackground': '#ff1010',
-            '--toastColor': 'white',
-          }});
-        });
+      user.login(password,username).then(res=>{
+        toast.push("login successfull",{theme:{
+          '--toastBackground': '#4bb543',
+          '--toastColor': 'black',
+        }});
+        push("#/");
+      }).catch(e=>{
+        toast.push(e.message,{theme:{
+          '--toastBackground': '#ff1010',
+          '--toastColor': 'white',
+        }});
+      });
     }
 </script>
 

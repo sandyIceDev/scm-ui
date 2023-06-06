@@ -3,7 +3,7 @@
     export let mid;
     export let content;
     export let time;
-    export let seen;
+    export let seen = false;
     export let me = false; 
     let messageDirection  = me ? "message-right" : "message-left";
     let formatedTime = new Date(time).toLocaleString("fa-IR",{hour: 'numeric', minute: 'numeric'})
@@ -17,11 +17,13 @@
         <div class="message-footer">
             <p class="time">{formatedTime}</p>
             <p class="seen">
-            {#if seen}
-                <Icon class="material-icons">done_all</Icon>
-            {:else}
-                <Icon class="material-icons">done</Icon>
-            {/if}
+                {#if !me}
+                    {#if seen}
+                        <Icon class="material-icons">done_all</Icon>
+                    {:else}
+                        <Icon class="material-icons">done</Icon>
+                    {/if}
+                {/if}
             </p>
         </div>
     </div>

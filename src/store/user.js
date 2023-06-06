@@ -1,12 +1,15 @@
+import { onDestroy } from "svelte";
 import { writable } from "svelte/store";
+import {generateEllipticParikey,sha256,aesEncrypt} from "../lib/cr";
 
 
-function createUser() {
+function userAdaptor() {
     let u = null;
     u = localStorage.getItem("User");
     if(u != null) 
         u = JSON.parse(u);
 	const { subscribe, set, update } = writable(u);
+    
     subscribe(user =>{
         if(user != null){
             u = user;
@@ -17,8 +20,13 @@ function createUser() {
 		subscribe,
 		register: async (name,username,password,email) => {
             if(u == null){
+                let parikey=generateEllipticParikey();
+                let publicKey = parikey.public;
+                let masterKey = sha256(username+":"+password);
+                password = sha256(password);
+                let privateKey = aesEncrypt(masterKey,parikey.private);
                 let result = await fetch("/api/auth/signup",{
-                    body:JSON.stringify({name,username,password,email}),
+                    body:JSON.stringify({name,username,password,email,publicKey,privateKey}),
                     method:"POST",
                     mode: "cors", // no-cors, *cors, same-origin
                     cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
@@ -86,6 +94,7 @@ function createUser() {
             }
         },
 		login: async (password,username) => {
+            password = sha256(password);
             if(u != null)
             {
                 let result = await fetch("/api/auth/login",{
@@ -100,7 +109,10 @@ function createUser() {
                 let response = await result.json();
                 if(response.ok)
                 {
-                    update(user=>user.jwt = response.token);
+                    update(user=> {
+                        user.jwt = response.token
+                        return user;
+                    });
                     localStorage.setItem("User",JSON.stringify(u));
                 }else
                     throw new Error(response.error);
@@ -117,7 +129,10 @@ function createUser() {
                 let response = await result.json();
                 if(response.ok)
                 {
-                    update(user=> user = {jwt:response.token});
+                    update(user=> {
+                        user = {jwt:response.token}
+                        return user;
+                    });
                     result = await fetch("/api/user/me",{
                         method:"GET",
                         mode: "cors", // no-cors, *cors, same-origin
@@ -129,7 +144,10 @@ function createUser() {
                     });
                     response = await result.json();
                     if(response.ok){
-                        update(user=> user = {...u,...response.data});
+                        update(user=> {
+                            user = {...user,...response.data};
+                            return user;
+                        });
                         localStorage.setItem("User",JSON.stringify(u));
                     }else{
                         throw new Error(response.error);
@@ -141,6 +159,7 @@ function createUser() {
         logout: () => {
             if(u != null)
                 u = null;
+            set(null);
             localStorage.clear();
         },
         check: async () => {
@@ -148,18 +167,44 @@ function createUser() {
                 return "register";
             if(!u.hasOwnProperty("jwt"))
                 return "login";
-            let result = await fetch("/api/user/me",{
-                mode: "cors", // no-cors, *cors, same-origin
-                cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-                headers: {
-                    "Content-Type": "application/json",
-                    "jwt-access-token":u.jwt
+            try{
+                let result = await fetch("/api/user/me",{
+                    mode: "cors", // no-cors, *cors, same-origin
+                    cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+                    headers: {
+                        "Content-Type": "application/json",
+                        "jwt-access-token":u.jwt
+                    }
+                });
+                let response = await result.json();
+                return response.ok;
+            }catch(e){
+                return false;
+            }
+        },
+        credentials:async () => {
+            if(u==null)
+                throw new Error("invalid user");
+            else{
+                let result = await fetch("/api/user/credentials",{
+                    mode: "cors", // no-cors, *cors, same-origin
+                    cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+                    headers: {
+                        "Content-Type": "application/json",
+                        "jwt-access-token":u.jwt
+                    }
+                });
+                let response = await result.json();
+                if(response.ok){
+                    update(u=>{return {
+                        ...u,...response.data
+                    }});
+                }else{
+                    throw new Error(response.error);
                 }
-            });
-            let response = await result.json();
-            return response.ok;
+            }
         }
 	};
 }
 
-export const user = createUser();
+export const user = userAdaptor();
