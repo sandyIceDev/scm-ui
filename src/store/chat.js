@@ -9,6 +9,11 @@ export const chatType ={
     me:3
 };
 
+export const PvChatStatus = {
+    pending:0,
+    accepted:1,
+    rejected:2
+}
 function chatsAdaptor(){
     let chats = null;
     let current_user;
@@ -19,7 +24,7 @@ function chatsAdaptor(){
     if(chats != null) 
         chats = JSON.parse(chats);
     else
-        chats = [];
+        chats = {};
     const { 
         subscribe,
         set,
@@ -44,10 +49,44 @@ function chatsAdaptor(){
                 }
             });
             let response = await result.json();
-            if(response.ok)
+            if(response.ok){
+                response.chat["chatId"] = response.chat["_id"];
+                delete response.chat["_id"];
+                update(x=>{
+                    x[response.chat["chatId"]] = response.chat;
+                    return {
+                        ...x
+                    };
+                })
                 return response.message;
+            }
             else
                 throw new Error(response.error);
+        },
+        feedback:async (accept,chatId)=>{
+            let result = await fetch("/api/chat/feedback",{
+                method:"POST",
+                body:JSON.stringify({accept,chatId}),
+                mode: "cors", // no-cors, *cors, same-origin
+                cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+                headers: {
+                    "Content-Type": "application/json",
+                    "jwt-access-token":current_user.jwt
+                }
+            });
+            let response = await result.json();
+            if(response.ok){
+                chats[chatId].private.status = accept ? PvChatStatus.accepted : PvChatStatus.rejected;
+                update(c=>{
+                    return {
+                        ...c,
+                        ...chats
+                    }
+                });
+            }
+            else
+                throw new Error(response.error);
+            
         },
         refresh:async ()=>{
             let result = await fetch("/api/chat/list",{
@@ -62,18 +101,22 @@ function chatsAdaptor(){
             let response = await result.json();
             if(response.ok)
             {
-                update(c=>{
-                    return response.chats.map(chat=>{
-                       chat["chatId"] = chat["_id"];
-                       delete chat["_id"];
-                       return chat;
-                    });
+                chats  = {};
+                response.chats.forEach(chat=>{
+                    let cid = chat["_id"];
+                    delete chat["_id"];
+                    chats[cid] = {
+                        ...chat,
+                        chatId:cid
+                    };
                 });
+                set(chats);
             }
-            else{
-
-            }
-        }
+        },
+        getChats:()=>{
+            return chats;
+        },
+        update,
     }
 }
 

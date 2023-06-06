@@ -1,6 +1,18 @@
 * {
     padding:0;
     margin: 0;
+    color:white;
+}
+::-webkit-scrollbar{
+    width: 5px;
+    background: none;
+}
+
+::-webkit-scrollbar-thumb{
+    background: #ffffff9e;
+}
+::-webkit-scrollbar-button{
+    display: none;
 }
 .container {
     display:flex;
@@ -8,9 +20,16 @@
     height: 100vh;
     width: 100vw;
 }
+.welcom{
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
 .app-content{
     height: calc(100vh - 120px);
-    overflow: scroll;
+    overflow: auto;
 }
 .app-bar{
     height: 120px;
@@ -18,20 +37,37 @@
 }
 .app-inbar{
     width: 100%;
-    min-height: 60px;
+    min-height: 10px;
     max-height: 15vh;
     height: auto;
-    /* background: #7f7f7ff0; */
     border:none;
-    border-top:1px solid red;
+    border-top:1px solid #2d7d76;
     word-wrap: break-word;
     overflow-y: scroll;
     font-size: x-large;
+    background-image: linear-gradient(-90deg, #2d7d76, transparent);
+    transition: 1s;
 }
+
 .app-inbar:focus{
     outline: none;
+    min-height: 60px;
     border-top:1px solid green;
+    background-image: linear-gradient(-90deg, green, transparent);
 }
+
+.app-approvebar{
+    width: 100%;
+    height: 60px;
+    border:none;
+    background-image:linear-gradient(-90deg,#5433ff,#20bdff,#a5fecb);
+    border-top:1px solid red;
+    font-size: x-large;
+    display:flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
 .send-btn{
     background-color:rgb(0, 255, 115);
     display: block;

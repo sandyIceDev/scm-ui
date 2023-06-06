@@ -7,12 +7,13 @@
     export let me = false; 
     let messageDirection  = me ? "message-right" : "message-left";
     let formatedTime = new Date(time).toLocaleString("fa-IR",{hour: 'numeric', minute: 'numeric'})
+    $: htmlContent = content.replaceAll("\n","</br>");
 </script>
 
 <div class={messageDirection} data-mid={mid}>
     <div class="message">
         <div class="message-body">
-            <p class="content">{content}</p>
+            <p class="content">{@html htmlContent}</p>
         </div>
         <div class="message-footer">
             <p class="time">{formatedTime}</p>

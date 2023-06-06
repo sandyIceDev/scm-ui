@@ -6,9 +6,9 @@
 	import { toast } from "@zerodevx/svelte-toast";
 	import ChatsList from "./ChatsList.svelte";
 	import { chats } from "../store/chat";
-	import { chatId } from "../store/peer";
+	import { peer } from "../store/peer";
+    import updateHandler from "../store/update";
 
-    let peer = null;
     let websocket = null;
     let connection_state = "pending";
     
@@ -20,6 +20,7 @@
             console.log("connected to server!");
             connection_state = "connected";
         };
+        websocket.onmessage = updateHandler;
         websocket.onclose = (e)=>{
             connection_state = "disconnected";
         };
@@ -52,8 +53,10 @@
     });
     function HandleChat(e){
         let selectedChatId = e.detail.chatId;
-        chatId.set(selectedChatId);
+        console.log(e.detail);
+        peer.setChatId(selectedChatId);
     }
+    
 </script>
 
 <svelte:head>

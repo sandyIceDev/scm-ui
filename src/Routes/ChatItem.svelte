@@ -7,7 +7,7 @@
 
 
     export let chatId;
-    $: chatItem = $chats.find(x=>x.chatId === chatId);
+    $: chatItem = $chats[chatId];
     let peer = null;
     let name;
     let username;

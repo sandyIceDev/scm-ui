@@ -203,6 +203,9 @@ function userAdaptor() {
                     throw new Error(response.error);
                 }
             }
+        },
+        getUser:()=>{
+            return u
         }
 	};
 }

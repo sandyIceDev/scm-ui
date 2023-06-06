@@ -15,14 +15,15 @@
         currentTab = tabName;
     }
     function doSearch(){
+        console.log(chats.getChats());
     }
     function handleChatRequest(){
         chats.request(contentInput).then(res=>{
-        toast.push(res,{theme:{
-          '--toastBackground': '#4bb543',
-          '--toastColor': 'black',
-        }});
-        chats.refresh();
+            toast.push(res,{theme:{
+            '--toastBackground': '#4bb543',
+            '--toastColor': 'black',
+            }});
+        currentTab = "chats";
       }).catch(e=>{
         toast.push(e.message,{theme:{
           '--toastBackground': '#ff1010',
@@ -62,7 +63,7 @@
         </h1>
         <div>
             {#if currentTab === "chats"}
-                <IconButton class="material-icons" on:click={()=>setTab("search")}>
+                <IconButton class="material-icons" on:click={doSearch}> <!--setTab("search")-->
                     search
                 </IconButton>
             {:else}
@@ -75,8 +76,8 @@
     <div class="app-content">
             {#if currentTab === "chats"}
                 <div class="contacts">
-                    {#each $chats as chat (chat.chatId)}
-                        <ChatItem chatId={chat.chatId} on:selctChat />
+                    {#each Object.entries($chats) as [chatId,chat] (chatId)}
+                        <ChatItem chatId={chatId} on:selctChat />
                     {/each}
                 </div>
             {:else if currentTab === "search"}
