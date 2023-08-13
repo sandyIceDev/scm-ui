@@ -7,12 +7,12 @@
 	import { user } from "../store/user";
 	import Fab from "@smui/fab";
     import { toast } from "@zerodevx/svelte-toast";
+    import { messages } from "../store/message";
 
 
     let contact;
     let chat;
     let inbox;
-    let messages = [];
     let askApproveChat = false;
 
     function initial(){
@@ -31,10 +31,12 @@
                     name:"saved message"
                 }
             }
+            messages.refresh().then(()=>{
+                console.log("messages loaded");
+            });
         }
     }
     let unsubpeer;
-;
     onMount(()=>{
         unsubpeer = peer.subscribe(x=>{
             chat = x;
@@ -47,6 +49,7 @@
 
         
     function handleAnswerRequest(response){
+        askApproveChat = false;
         chats.feedback(response,$peer.chatId).catch(e=>{
             toast.push(e.message,{theme:{
                 '--toastBackground': '#ff1010',
@@ -79,10 +82,10 @@
     <link href="/css/message.css" rel="stylesheet" type="text/css" />
 </svelte:head>
 <section class="main">
-    {#if chat !== null}
+    {#if chat !== null && chat !== undefined}
         <nav class="app-bar">
             <div>
-                <h1>{peer.name}</h1>
+                <h1>{contact.name}</h1>
             </div>
             <div>
                 <IconButton class="material-icons">
@@ -91,8 +94,8 @@
             </div> 
         </nav>
         <div class="app-content">
-            {#each messages as m,i}
-            <Message {...m}/>
+            {#each Object.keys($messages) as mid}
+                <Message {mid}/>
             {/each}
         </div>
         {#if askApproveChat}

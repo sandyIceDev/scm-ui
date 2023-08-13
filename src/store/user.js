@@ -11,9 +11,11 @@ function userAdaptor() {
 	const { subscribe, set, update } = writable(u);
     
     subscribe(user =>{
-        if(user != null){
+        if(user){
             u = user;
-            localStorage.setItem("User",JSON.stringify(user));
+            let cloned_user = {...user};
+            delete cloned_user["masterKey"]
+            localStorage.setItem("User",JSON.stringify(cloned_user));
         }
     });
 	return {
@@ -23,6 +25,7 @@ function userAdaptor() {
                 let parikey=generateEllipticParikey();
                 let publicKey = parikey.public;
                 let masterKey = sha256(username+":"+password);
+                console.log(masterKey);
                 password = sha256(password);
                 let privateKey = aesEncrypt(masterKey,parikey.private);
                 let result = await fetch("/api/auth/signup",{
@@ -41,6 +44,8 @@ function userAdaptor() {
                         name,
                         username,
                         email,
+                        private:privateKey,
+                        masterKey,
                         uuid:response.uuid,
                         verify:false
                     });
@@ -94,9 +99,10 @@ function userAdaptor() {
             }
         },
 		login: async (password,username) => {
-            password = sha256(password);
             if(u != null)
             {
+                let masterKey = sha256(u.username+":"+password);
+                password = sha256(password);
                 let result = await fetch("/api/auth/login",{
                     body:JSON.stringify({username:u.username,password}),
                     method:"POST",
@@ -110,13 +116,16 @@ function userAdaptor() {
                 if(response.ok)
                 {
                     update(user=> {
-                        user.jwt = response.token
+                        user.jwt = response.token;
+                        user.masterKey = masterKey;
                         return user;
                     });
-                    localStorage.setItem("User",JSON.stringify(u));
                 }else
                     throw new Error(response.error);
             }else{
+
+                let masterKey = sha256(username+":"+password);
+                password = sha256(password);
                 let result = await fetch("/api/auth/login",{
                     body:JSON.stringify({username,password}),
                     method:"POST",
@@ -145,10 +154,9 @@ function userAdaptor() {
                     response = await result.json();
                     if(response.ok){
                         update(user=> {
-                            user = {...user,...response.data};
+                            user = {...user,...response.data,masterKey:masterKey};
                             return user;
                         });
-                        localStorage.setItem("User",JSON.stringify(u));
                     }else{
                         throw new Error(response.error);
                     }
@@ -165,8 +173,9 @@ function userAdaptor() {
         check: async () => {
             if(u == null)
                 return "register";
-            if(!u.hasOwnProperty("jwt"))
+            if(!u.hasOwnProperty("jwt") || u.masterKey == undefined || u.masterKey == null)
                 return "login";
+
             try{
                 let result = await fetch("/api/user/me",{
                     mode: "cors", // no-cors, *cors, same-origin

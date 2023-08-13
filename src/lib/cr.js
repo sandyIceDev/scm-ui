@@ -9,7 +9,7 @@ import elliptic from 'elliptic';
  * }
  */
 function signMessage(msg, secretKey){
-    const hmac = CryptoJS.HmacSHA256(msg.data, secretKey);
+    const hmac = CryptoJS.HmacSHA256(msg.content, secretKey);
     const signature = CryptoJS.enc.Base64.stringify(hmac);
     msg.signature = signature;
 }
@@ -43,7 +43,8 @@ function generateEllipticShareKey(prvKey,pubKey){
 function aesEncrypt(sharedKey,msg){
     var key = CryptoJS.enc.Hex.parse(sharedKey); // 256-bit key
     var iv = CryptoJS.enc.Hex.parse(CryptoJS.SHA256(sharedKey).toString().substring(0,32));
-    var encrypted = CryptoJS.AES.encrypt(msg, key, {
+    var encrypted = CryptoJS.AES.encrypt(msg, key
+        , {
         iv: iv,
         mode: CryptoJS.mode.CBC,
         padding: CryptoJS.pad.Pkcs7

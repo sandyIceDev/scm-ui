@@ -32,8 +32,10 @@ function chatsAdaptor(){
     } = writable(chats);
 
     subscribe(c=>{
-        chats = c;
-        localStorage.setItem("chats",JSON.stringify(c));
+        if(c != null && c != undefined){
+            chats = c;
+            localStorage.setItem("chats",JSON.stringify(c));
+        }
     });
     return {
         subscribe,
@@ -115,6 +117,9 @@ function chatsAdaptor(){
         },
         getChats:()=>{
             return chats;
+        },
+        getChat:(chatid)=>{
+            return chats[chatid];
         },
         update,
     }

@@ -23,43 +23,37 @@ function messageAdaptor(){
     return {
         subscribe,
         update,
-        sendMessage:async (content)=>{
-            if(chat){
-                let result = await fetch("/api/message/send",{
-                    body:JSON.stringify({chatid:chat.chatId,content}),
-                    method:"POST",
-                    cache: "no-cache",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "jwt-access-token":current_user.jwt
-                    }
-                });
-                return await result.json();
-            }else{
-                throw new Error("invalid chatid");
-            }
+        add:(msg)=>{
+            let mid = msg["_id"];
+            delete msg["_id"];
+            messages[mid] = msg;
+            set(messages);
         },
         refresh:async ()=>{
             if(chat){
                 let result = await fetch("/api/message/list",{
-                    method:"GET",
+                    method:"POST",
                     cache: "no-cache",
+                    body:JSON.stringify({chatid:chat.chatId}),
                     headers: {
                         "Content-Type": "application/json",
                         "jwt-access-token":current_user.jwt
                     }
                 });
                 let res = await result.json();
-                for(let message in res.chats){
+                res.forEach(message=>{
                     let mid = message["_id"];
                     delete message["_id"];
-                    message[mid] = mid;
                     messages[mid] = message;
-                }
+                });
                 set(messages);
             }else{
                 throw new Error("invalid chatid");
             }
+        },getMessage:(mid)=>{
+            if(messages.hasOwnProperty(mid))
+                return messages[mid];
+            return null;
         },
         set
     }

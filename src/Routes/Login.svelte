@@ -4,7 +4,7 @@
     import { user } from "../store/user"; 
     import Button, {Label} from "@smui/button";
     import { onMount,onDestroy } from "svelte";
-	import { aesEncrypt, generateEllipticParikey } from '../lib/cr';
+	import { aesEncrypt, aesDecrypt } from '../lib/cr';
 	import sha256 from 'crypto-js/sha256';
 	import { push } from 'svelte-spa-router';
     let username = "";

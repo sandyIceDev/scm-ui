@@ -64,6 +64,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </svelte:head>
 <div class="container">
-    <ChatsList on:selctChat={HandleChat} connection_state={connection_state}/>
+    <ChatsList on:selectChat={HandleChat} connection_state={connection_state}/>
     <Chat/>
 </div>

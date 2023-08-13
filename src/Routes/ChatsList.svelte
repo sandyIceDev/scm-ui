@@ -32,7 +32,9 @@
       });
     }
     onMount(()=>{
-        chats.refresh();
+        if($user){
+            chats.refresh();
+        }
     });
     
 </script>
@@ -77,7 +79,7 @@
             {#if currentTab === "chats"}
                 <div class="contacts">
                     {#each Object.entries($chats) as [chatId,chat] (chatId)}
-                        <ChatItem chatId={chatId} on:selctChat />
+                        <ChatItem chatId={chatId} on:selectChat />
                     {/each}
                 </div>
             {:else if currentTab === "search"}

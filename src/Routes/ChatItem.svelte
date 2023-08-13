@@ -60,7 +60,7 @@
     });
     const dispatch = createEventDispatcher();
     function HandleChat(){
-        dispatch('selctChat', {
+        dispatch('selectChat', {
             chatId
         });	
     }
